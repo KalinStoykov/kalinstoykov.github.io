@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+                font-size: 24px;
+                font-size: 4vw;
+                font-weight: 300;
+                margin: 0;
+                padding: 0;
+            }
+            html {
+                height: 100%;
+                background: radial-gradient(circle, #fff, #ddd);
+                background-size: cover;
+            }
+            #calculator {
+                width: 12em;
+                height: auto;
+                background: linear-gradient(#4389a2, #5c258d);
+                margin: 1em auto;
+            }
+            .top button.clear {
+                float: left;
+                color: #fff;
+            }
+            .top #expressionOutput {
+                height: 3em;
+                width: 9em;
+                padding-right: 1em;
+                float: right;
+                color: #fff;
+                line-height: 3em;
+                text-align: right;
+                letter-spacing: 1px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+                border-left: 1px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .top #resultOutput {
+                height: 3em;
+                width: 9em;
+                padding-right: 1em;
+                float: right;
+                color: #fff;
+                line-height: 3em;
+                text-align: right;
+                letter-spacing: 1px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            }
+
+            .keys,
+            .top {
+                overflow: hidden;
+            }
+            .keys button,
+            .top button.clear {
+                float: left;
+                cursor: pointer;
+                width: 3em;
+                height: 3em;
+                line-height: 3em;
+                color: #fff;
+                text-align: center;
+                user-select: none;
+                transition: background-color 0.2s ease;
+                background: #4389a2;
+                border-right: 1px solid rgba(134, 147, 204, 0.3);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            }
+            .keys button.operator {
+                background: rgba(255, 255, 255, 0.2);
+                border-right: 0;
+                color: rgba(0, 0, 0, 0.5);
+            }
+            .keys button.equals {
+                color: #888e5f;
+            }
+            .keys button:hover {
+                background: rgba(255, 255, 255, 0.3);
+                color: #fff;
+            }
+            .keys button.equals:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: #fff;
+            }
+            .top button.clear:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: #fff;
+            }
+        </style>
+        <title>NUMPAD CALCULATOR</title>
+    </head>
+
+    <body onload="solve()">
+        <div id="calculator">
+            <!-- Screen and clear key -->
+            <div class="top">
+                <button class="clear" type="button" value="Clear">C</button>
+                <p id="expressionOutput"></p>
+                <p id="resultOutput"></p>
+                <div id="result"></div>
+            </div>
+
+            <div class="keys">
+                <!-- operators and other keys -->
+                <button type="button" value="7">7</button>
+                <button type="button" value="8">8</button>
+                <button type="button" value="9">9</button>
+                <button type="button" value="/">/</button>
+                <button type="button" value="4">4</button>
+                <button type="button" value="5">5</button>
+                <button type="button" value="6">6</button>
+                <button type="button" value="*">x</button>
+                <button type="button" value="1">1</button>
+                <button type="button" value="2">2</button>
+                <button type="button" value="3">3</button>
+                <button type="button" value="-">-</button>
+                <button type="button" value="0">0</button>
+                <button type="button" value=".">.</button>
+                <button type="button" value="=">=</button>
+                <button type="button" value="+">+</button>
+            </div>
+        </div>
+
+        <script>
+            function solve() {
+                let expressionFieldElement = document.getElementById(
+                    'expressionOutput'
+                );
+                let resultOutputElement = document.getElementById(
+                    'resultOutput'
+                );
+                let numbers = [
+                    '1',
+                    '2',
+                    '3',
+                    '4',
+                    '5',
+                    '6',
+                    '7',
+                    '8',
+                    '9',
+                    '0',
+                ];
+                let operators = ['/', '*', '-', '+'];
+                let isOperatorClicked = {
+                    isClicked: false,
+                    operator: '',
+                    isDotClicked: false,
+                };
+
+                for (let button of document.querySelectorAll('button')) {
+                    button.addEventListener('click', onButtonClick);
+                }
+
+                function onButtonClick(e) {
+                    let clickedButton = e.target.value;
+
+                    if (numbers.includes(clickedButton)) {
+                        expressionFieldElement.innerHTML += clickedButton;
+                    } else if (operators.includes(clickedButton)) {
+                        if (!isOperatorClicked.isClicked) {
+                            isOperatorClicked.isDotClicked = false;
+                            isOperatorClicked.isClicked = true;
+                            isOperatorClicked.operator = clickedButton;
+                            expressionFieldElement.innerHTML += ` ${clickedButton} `;
+                        }
+                    } else if (clickedButton === 'Clear') {
+                        clear();
+                    } else if (clickedButton === '=') {
+                        let expression = expressionFieldElement.innerHTML
+                            .split(' ')
+                            .filter(x => x !== '');
+
+                        if (expression.length === 3) {
+                            let [firstNum, operator, secondNum] = expression;
+                            firstNum = Number(firstNum);
+                            secondNum = Number(secondNum);
+                            let result = 0;
+
+                            switch (operator) {
+                                case '+':
+                                    result = firstNum + secondNum;
+                                    break;
+                                case '-':
+                                    result = firstNum - secondNum;
+                                    break;
+                                case '/':
+                                    result = firstNum / secondNum;
+                                    break;
+                                case '*':
+                                    result = firstNum * secondNum;
+                            }
+
+                            resultOutputElement.innerHTML = result;
+                        } else {
+                            resultOutputElement.innerHTML = NaN;
+                        }
+                    } else if (clickedButton === '.') {
+                        let currentText = expressionFieldElement.innerHTML;
+
+                        if (currentText && !isOperatorClicked.isDotClicked) {
+                            expressionFieldElement.innerHTML += '.';
+                            isOperatorClicked.isDotClicked = true;
+                        }
+                    }
+                }
+
+                function clear() {
+                    expressionFieldElement.innerHTML = '';
+                    resultOutputElement.innerHTML = '';
+                    isOperatorClicked.isClicked = false;
+                    isOperatorClicked.operator = '';
+                    isOperatorClicked.isDotClicked = false;
+                }
+            }
+        </script>
+    </body>
+</html>
